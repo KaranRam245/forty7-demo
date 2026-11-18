@@ -1,0 +1,20 @@
+# forty7-demo is one uv project for the whole repo. Every agent directory (hello-bot/, ...)
+# shares this file and the committed uv.lock beside it; a deploy builds an agent's tools from
+# these pins, so the lockfile is what makes a build reproducible.
+#
+#   uv lock          # generate/refresh uv.lock (commit it)
+#   uv sync          # create .venv with the SDK installed for local checks
+#   cd hello-bot && uv run forty7-sdk check   # run from an agent dir (cwd holds tools.py + agent.toml)
+[project]
+name = "forty7-demo"
+version = "0.0.0"
+description = "A forty7 demo agent: greeting + deepwiki MCP + a Python currency tool."
+requires-python = ">=3.12"
+dependencies = []
+
+# forty7-sdk is a dev dependency only. Local `forty7-sdk check`/`serve` need it, but the
+# deployed tools image installs the SDK from its base image and builds with `--no-dev`, so it
+# never reaches production.
+[dependency-groups]
+dev = ["forty7-sdk>=0.0.1"]
+

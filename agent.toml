@@ -1,6 +1,24 @@
 name = "hello-bot"
-description = "my first forty7 agent"
+description = "a minimal agent that greets, looks facts up over MCP, and converts currency with a Python tool — the full forty7 chain end to end"
 provider = "mistral"
 model = "ministral-14b-2512"
-secrets = ["mistral_api_key"]   # arrives in the pod as MISTRAL_API_KEY
 
+# Arrives as MISTRAL_API_KEY, where the runner already looks. The value lives in Secret
+# Manager as `agent-hello-bot-mistral_api_key`, written by terraform/landing-zone from
+# `agent_secrets`.
+secrets = ["mistral_api_key"]
+
+# Where this agent's Python tools may go. `api.frankfurter.dev` is what `exchange_rate`
+# calls. deepwiki's host is deliberately NOT here: the runner derives it from the [[mcp]]
+# url below and makes those calls itself, so a tool never reaches it.
+egress = ["api.frankfurter.dev"]
+
+# A third-party server whose tools we did not write, reached over the same egress proxy.
+# Its host is derived into the allow-list from this URL. Public and no-auth, so there is no
+# secret to wire up.
+[[mcp]]
+name = "deepwiki"
+url = "https://mcp.deepwiki.com/mcp"
+
+[tools]
+module = "tools.py"
